@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+    <style>
+        body {
+            font-size: .875rem;
+            background-color: #343a40;
+            color: #fff;
+        }
+
+        .feather {
+            width: 16px;
+            height: 16px;
+            vertical-align: text-bottom;
+        }
+
+        /*
+         * Sidebar
+         */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            /* rtl:raw:
+            right: 0;
+            */
+            bottom: 0;
+            /* rtl:remove */
+            left: 0;
+            z-index: 100;
+            /* Behind the navbar */
+            padding: 48px 0 0;
+            /* Height of navbar */
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #343a40;
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                top: 5rem;
+            }
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* Scrollable contents if viewport is shorter than content. */
+        }
+
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .sidebar .nav-link .feather {
+            margin-right: 4px;
+            color: #999;
+        }
+
+        .sidebar .nav-link.active {
+            color: #007bff;
+        }
+
+        .sidebar .nav-link:hover .feather,
+        .sidebar .nav-link.active .feather {
+            color: #fff;
+        }
+
+        .sidebar-heading {
+            font-size: .75rem;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        /*
+         * Navbar
+         */
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar-brand {
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+            font-size: 1rem;
+            background-color: rgba(0, 0, 0, .25);
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+            color: #fff;
+        }
+
+        .navbar .navbar-toggler {
+            top: .25rem;
+            right: 1rem;
+            color: #fff;
+        }
+
+        .navbar .navbar-toggler-icon {
+            color: #fff;
+        }
+
+        .navbar .form-control {
+            padding: .75rem 1rem;
+            border-width: 0;
+            border-radius: 0;
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #fff;
+        }
+
+        .form-control-dark:focus {
+            border-color: transparent;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+        }
+
+        .container {
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-card {
+            background-color: #444;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-card h4 {
+            color: #007bff;
+        }
+
+        .order-item {
+            border-bottom: 1px solid #666;
+            padding: 10px 0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .update-status-form {
+            padding: 20px;
+            background-color: #555;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Supplier Panel</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse"
+            data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a th:href="@{/home}" class="nav-link" aria-current="page">Quit Dashboard</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard">
+                                <span data-feather="home"></span>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#productForm">
+                                <span data-feather="file"></span>
+                                Add Product
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#productList">
+                                <span data-feather="shopping-cart"></span>
+                                My Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#stockStatus">
+                                <span data-feather="users"></span>
+                                Stock Status
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="bar-chart-2"></span>
+                                Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="layers"></span>
+                                Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-md-4">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard</h1>
+                </div>
+
+                <!-- Dashboard -->
+                <div id="dashboard" class="card container" style="display: block;">
+                    <h2 class="text-center mb-4">Dashboard</h2>
+                    <!-- <div class="row">
+                        <div th:each="order : ${activeOrders}" class="col-lg-4 col-md-6">
+                            <div class="order-card">
+                                <h4 class="order-item">Order #12345</h4>
+                                <div class="order-item" th:each="orderDetail : ${order.orderDetails}">
+                                    <span th:text="${orderDetail.product.name}"></span>
+                                </div>
+                                <div class="order-item"
+                                    th:text="${order.customer.firstName}+' '+${order.customer.lastName}"></div>
+                                <div class="order-item" th:text="${#dates.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">
+                                </div>
+                                <div class="order-item" th:text="'Total Price: $'+${order.totalAmount}"></div>
+                                <div class="order-item" th:text="'Status: '+${order.orderDetails.get(0).status}"></div>
+                                <div class="update-status-form">
+                                    <form th:action="@{/supplier/updateOrderStatus}" method="post">
+                                        <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+                                        <div class="form-group">
+                                            <select class="form-control" id="orderStatus" name="orderStatus">
+                                                <option th:each="status : ${orderStatusTypeList}" th:value="${status}"
+                                                    th:selected="${status == order.orderDetails.get(0).status}"
+                                                    th:text="${#strings.capitalize(status.toString().toLowerCase())}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-block btn-sm ">
+                                            Update Status
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-info" onclick="toggleOrders('activeOrder')">
+                                    Active Orders (<span th:text="${#lists.size(activeOrders)}"></span>)
+                                </button>
+                                <button class="btn btn-info" onclick="toggleOrders('completedOrder')">
+                                    Past Orders (<span th:text="${#lists.size(completedOrders)}"></span>)</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div th:each="order : ${activeOrders}" class="activeOrder order-list col-lg-4 col-md-6">
+                                <!-- Order kartı içeriği -->
+                                <div class="order-card">
+                                    <h4 class="order-item">Order #12345</h4>
+                                    <div class="order-item" th:each="orderDetail : ${order.orderDetails}">
+                                        <span th:text="${orderDetail.product.name}"></span>
+                                    </div>
+                                    <div class="order-item"
+                                        th:text="${order.customer.firstName}+' '+${order.customer.lastName}">
+                                    </div>
+                                    <div class="order-item"
+                                        th:text="${#dates.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">
+                                    </div>
+                                    <div class="order-item" th:text="'Total Price: $'+${order.totalAmount}">
+                                    </div>
+                                    <div class="order-item" th:text="'Status: '+${order.orderDetails.get(0).status}">
+                                    </div>
+                                    <div class="update-status-form">
+                                        <form th:action="@{/supplier/updateOrderStatus}" method="post">
+                                            <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+                                            <div class="form-group">
+                                                <select class="form-control" id="orderStatus" name="orderStatus">
+                                                    <option th:each="status : ${orderStatusTypeList}"
+                                                        th:value="${status}"
+                                                        th:selected="${status == order.orderDetails.get(0).status}"
+                                                        th:text="${#strings.capitalize(status.toString().toLowerCase())}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block btn-sm ">
+                                                Update Status
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:each="order : ${completedOrders}"
+                                class="completedOrder order-list col-lg-4 col-md-6" style="display: none;">
+                                <!-- Order kartı içeriği -->
+                                <div class="order-card">
+                                    <h4 class="order-item">Order #12345</h4>
+                                    <div class="order-item" th:each="orderDetail : ${order.orderDetails}">
+                                        <span th:text="${orderDetail.product.name}"></span>
+                                    </div>
+                                    <div class="order-item"
+                                        th:text="${order.customer.firstName}+' '+${order.customer.lastName}">
+                                    </div>
+                                    <div class="order-item"
+                                        th:text="${#dates.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">
+                                    </div>
+                                    <div class="order-item" th:text="'Total Price: $'+${order.totalAmount}">
+                                    </div>
+                                    <div class="order-item" th:text="'Status: '+${order.orderDetails.get(0).status}">
+                                    </div>
+                                    <div class="update-status-form">
+                                        <form th:action="@{/supplier/updateOrderStatus}" method="post">
+                                            <input type="hidden" th:name="orderId" th:value="${order.orderId}" />
+                                            <div class="form-group">
+                                                <select class="form-control" id="orderStatus" name="orderStatus">
+                                                    <option th:each="status : ${orderStatusTypeList}"
+                                                        th:value="${status}"
+                                                        th:selected="${status == order.orderDetails.get(0).status}"
+                                                        th:text="${#strings.capitalize(status.toString().toLowerCase())}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-block btn-sm ">
+                                                Update Status
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Form -->
+                <div id="productForm" class="card mb-4 bg-dark text-white"
+                    th:style="${#fields.hasErrors('product.*')} ? 'display: block;' : 'display: none;'">
+                    <div class="card-header">
+                        Create Product
+                    </div>
+
+                    <div class="card-body">
+                        <div id="notification" class="notification-container">
+                            <span class="d-block w-25 alert alert-success alert-dismissible fade show" role="alert"
+                                th:if="${!#strings.isEmpty(productCreatedMessage)}">
+                                <strong>Product Created Successfully!</strong>
+                            </span>
+                        </div>
+                        <!-- Product creation form can be placed here -->
+                        <form th:action="@{/supplier/createProduct}" method="post" th:object="${product}">
+                            <div class="form-group">
+                                <label for="name">Product Name</label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}"
+                                    placeholder="Enter product name">
+                                <div th:if="${#fields.hasErrors('name')}" class="alert alert-danger mt-1"
+                                    th:errors="*{name}">
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea class="form-control" id="productDescription" rows="3"
+                                    th:field="*{description}" placeholder="Enter product description"></textarea>
+                                <div th:if="${#fields.hasErrors('description')}" class="alert alert-danger mt-1"
+                                    th:errors="*{description}"></div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price</label>
+                                <input type="number" class="form-control" id="price" th:field="*{price}"
+                                    placeholder="Enter product price">
+                                <div th:if="${#fields.hasErrors('price')}" class="alert alert-danger mt-1"
+                                    th:errors="*{price}">
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="stockQuantity">Stock Quantity</label>
+                                <input type="number" class="form-control" id="stockQuantity" th:field="*{stockQuantity}"
+                                    placeholder="Enter stock quantity">
+                                <div th:if="${#fields.hasErrors('stockQuantity')}" class="alert alert-danger mt-1"
+                                    th:errors="*{stockQuantity}"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Product List -->
+                <div id="productList" class="card mb-4 bg-dark text-white"
+                    th:style="${focusProductList} ? 'display: block;' : 'display: none;'">
+                    <div class="card-header">
+                        Product List
+                    </div>
+                    <div class="card-body">
+                        <!-- Product list table or cards can be placed here -->
+                        <table class="table table-dark text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Stock Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product, stat: ${products}">
+                                    <td th:text="${stat.count}"></td>
+                                    <td th:text="${product.name}"></td>
+                                    <td th:text="${product.description}"></td>
+                                    <td th:text="${product.price}"></td>
+                                    <td th:text="${product.stockQuantity}"></td>
+                                    <td><!-- Update Button -->
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                            th:attr="data-target='#updateProductModal' + ${product.productId}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" th:id="'updateProductModal' + ${product.productId}"
+                                            tabindex="-1" role="dialog" aria-labelledby="updateProductModalLabel"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content bg-dark">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="updateProductModalLabel">Update
+                                                            Product
+                                                        </h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form th:action="@{/supplier/updateProduct}" method="post"
+                                                            th:object="${product}">
+                                                            <input type="hidden" name="productId"
+                                                                th:value="${product.productId}" />
+                                                            <div class="form-group">
+                                                                <label for="name">Name</label>
+                                                                <input type="text" name="name" class="form-control"
+                                                                    th:value="${product.name}" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="description">Description</label>
+                                                                <input type="text" name="description"
+                                                                    class="form-control"
+                                                                    th:value="${product.description}" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="price">Price</label>
+                                                                <input type="text" name="price" class="form-control"
+                                                                    th:value="${product.price}" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="stockQuantity">Stock Quantity</label>
+                                                                <input type="text" name="stockQuantity"
+                                                                    class="form-control"
+                                                                    th:value="${product.stockQuantity}" />
+                                                            </div>
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Other product rows can be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Stock Status -->
+                <div id="stockStatus" class="card mb-4 bg-dark text-white" style="display: none;">
+                    <div class="card-header">
+                        Stock Status
+                    </div>
+                    <div class="card-body">
+                        <!-- Product list table or cards can be placed here -->
+                        <table class="table table-dark text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Stock Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="product, stat: ${products}">
+                                    <td th:text="${stat.count}"></td>
+                                    <td th:text="${product.name}"></td>
+                                    <td th:text="${product.stockQuantity}"></td>
+                                </tr>
+                                <!-- Other product rows can be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap ve jQuery bağımlılıkları -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace()
+    </script>
+    <script>
+
+        // Sayfa yüklendiğinde çalışacak kod
+        document.addEventListener('DOMContentLoaded', function () {
+            // .alert class'ına sahip tüm öğeleri seç
+            var alerts = document.querySelectorAll('.alert');
+            // Her bir öğe için işlem yap
+            alerts.forEach(function (alert) {
+                if (alert) {
+                    // 5 saniye sonra öğeyi gizle
+                    setTimeout(function () {
+                        alert.style.display = 'none';
+                    }, 5000);
+                }
+            });
+
+        });
+
+        // Sidebar'daki linklere tıklandığında ilgili bileşenleri göster
+        document.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                var targetId = link.getAttribute('href').substring(1);
+                showComponent(targetId);
+                setActiveLink(link);
+            });
+        });
+
+        // Gösterilen bileşenin dışındaki diğer bileşenleri gizle
+        function showComponent(componentId) {
+            document.querySelectorAll('.card').forEach(function (component) {
+                if (component.id === componentId) {
+                    component.style.display = 'block';
+                } else {
+                    component.style.display = 'none';
+                }
+            });
+        }
+
+        // Aktif olan sidebar bağlantısına aktif sınıfını ekle
+        function setActiveLink(activeLink) {
+            document.querySelectorAll('.nav-link').forEach(function (link) {
+                link.classList.remove('active');
+            });
+            activeLink.classList.add('active');
+        }
+    </script>
+    <script th:inline="javascript">
+        function toggleOrders(tabClassName) {
+            var activeOrderList = document.getElementsByClassName('activeOrder');
+            var completedOrderList = document.getElementsByClassName('completedOrder');
+
+            if (tabClassName === 'activeOrder') {
+                for (var i = 0; i < activeOrderList.length; i++) {
+                    activeOrderList[i].style.display = 'block';
+                }
+                for (var i = 0; i < completedOrderList.length; i++) {
+                    completedOrderList[i].style.display = 'none';
+                }
+
+            }
+            else if (tabClassName === 'completedOrder') {
+                for (var i = 0; i < completedOrderList.length; i++) {
+                    completedOrderList[i].style.display = 'block';
+                }
+                for (var i = 0; i < activeOrderList.length; i++) {
+                    activeOrderList[i].style.display = 'none';
+                }
+
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Özel CSS Stilleri */
+        /* İsteğe göre ek CSS stili ekle */
+    </style>
+</head>
+
+<body>
+
+    <!-- header -->
+    <div th:replace="~{layouts/header :: header}">...</div>
+
+    <!-- Ürün Detayları -->
+    <div class="container" style="margin-top: 10vh;">
+        <div class="row">
+            <div class="col-lg-6">
+                <img src="https://via.placeholder.com/400x400" class="img-fluid" alt="Ürün Resmi">
+            </div>
+            <div class="col-lg-6">
+                <h2 th:text="${product.name}"></h2>
+                <p class="text-muted" th:text="${product.description}"></p>
+                <p class="font-weight-bold" th:text="'$'+${product.price}"></p>
+
+                <form th:action="@{/addItemToCart}" method="post" sec:authorize="hasRole('ROLE_CUSTOMER')">
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" value="1">
+                    </div>
+                    <input type="hidden" name="slug" th:value="${product.slug}" />
+                    <input type="hidden" name="supplierName" th:value="${product.supplier.companyName}" />
+                    <button type="submit" class="btn btn-primary d-block w-75 mb-2 btn-product-content">
+                        Add to Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Ürün Yorumları -->
+    <div class="container mt-5">
+        <h3>Comments</h3>
+
+        <div class="row" th:each="review : ${product.reviews}">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <img src="https://via.placeholder.com/64" alt="User Image" class="rounded-circle"
+                                style="width: 50px; height: 50px;">
+                            <div class="ml-3">
+                                <h5 class="card-title mb-0"
+                                    th:text="${#strings.substring(review.customer.firstName, 0, 1)} + ${#strings.repeat('*', #strings.length(review.customer.firstName) - 1)} + ' ' + ${#strings.substring(review.customer.lastName, 0, 1)} + ${#strings.repeat('*', #strings.length(review.customer.lastName) - 1)}">
+                                </h5>
+                                <div class="text-warning">
+                                    <span class="star"
+                                        th:each="star : ${#numbers.sequence(1, review.rating)}">&#9733;</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="card-text mt-3" th:text="${review.comment}"></p>
+                        <p class="card-text"><small class="text-muted" th:text="${review.date}"></small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Benzer Ürünler -->
+    <div class="container mt-5">
+        <h3>Benzer Ürünler</h3>
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card">
+                    <img src="https://via.placeholder.com/200x200" class="card-img-top" alt="Benzer Ürün">
+                    <div class="card-body">
+                        <h5 class="card-title">Benzer Ürün Adı</h5>
+                        <p class="card-text">$14.99</p>
+                        <a href="#" class="btn btn-primary btn-sm">Detaylar</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Daha fazla benzer ürün kartı eklemek için gerektiği kadar div kopyalayabilirsiniz -->
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

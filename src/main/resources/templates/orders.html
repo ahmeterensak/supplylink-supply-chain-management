@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Custom CSS */
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .order-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .order-item .order-number {
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .order-item .order-date {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .order-item .order-details a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .order-item .order-details a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 20px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .rating {
+            display: inline-block;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            margin: 0;
+            padding: 0;
+            font-size: 30px;
+        }
+
+        .rating label:before {
+            content: "\2605";
+            color: #ccc;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .rating input:checked~label:before {
+            color: #f90;
+        }
+
+        .rating input:checked~label:hover~label:before {
+            color: #f90;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- header -->
+    <div th:replace="~{layouts/header :: header}">...</div>
+
+    <div style="margin-top: 12vh;">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div th:each="orderPair : ${orderMap}" class="order-item">
+                    <!-- Order Preview Card -->
+                    <div class="row">
+                        <div class="col-md-4 d-flex">
+                            <div class="col-md-6">
+                                <!-- Product Image -->
+                                <img src="https://via.placeholder.com/200x200" alt="Product Image" width="80">
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Order number & date -->
+                                <p class="order-number">Order No: <strong>123456</strong></p>
+                                <p class=" order-date"
+                                    th:text="${#dates.format(orderPair.key.orderDate, 'dd-MM-yyyy HH:mm')}"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- Order Status -->
+                            <div class="d-flex h-100 align-items-center justify-content-center">
+                                <p class="order-status text-info" th:text="${orderPair.key.status}">
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <!-- Sipariş Tutarı ve Açılır Detay Butonu -->
+                            <div class="order-details text-center d-flex justify-content-end align-items-center h-100">
+                                <span class="text-success font-weight-bold"
+                                    th:text="'$' + ${orderPair.key.totalAmount}"></span>
+                                <a class="ml-5 btn btn-circle bg-light" href="#" data-toggle="collapse"
+                                    th:data-target="'#orderDetails' + ${orderPair.key.orderId}">
+                                    <i class="fas fa-chevron-down text-secondary"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Açılır Detaylar -->
+                    <div class="row collapse" th:id="'orderDetails' + ${orderPair.key.orderId}">
+                        <div th:each="supplierPair : ${orderPair.value}" class="col-md-12">
+                            <div class="card">
+                                <div class="card-header" th:text="${supplierPair.key.companyName}">
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <!-- Her bir ürün için döngü -->
+                                    <li th:each="detail : ${supplierPair.value}" class="list-group-item">
+                                        <div class="d-flex justify-content-start align-items-center">
+                                            <!-- Ürün Görseli -->
+                                            <img src="https://via.placeholder.com/200x200" alt="Product Image"
+                                                width="50">
+                                            <div class="ml-5">
+                                                <!-- Ürün Adı -->
+                                                <h6 class="mb-0" th:text="${detail.product.name}"></h6>
+                                                <!-- Review Button (Only shows on DELIVERED status) -->
+                                                <!-- Ürün Fiyatı -->
+                                                <span class="text-muted" th:text="'$' + ${detail.product.price}"></span>
+                                            </div>
+                                            <div class="ml-auto">
+                                                <button
+                                                    th:if="${detail.status == T(com.aes.supplylinksupplychainmanagement.enums.OrderStatus).DELIVERED and !#lists.contains(reviewedProducts, detail.product.productId)}"
+                                                    type="button" class="btn btn-primary ml-5" data-toggle="modal"
+                                                    data-target="#reviewModal">
+                                                    Review
+                                                </button>
+                                                <!-- Review Modal -->
+                                                <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog"
+                                                    aria-labelledby="reviewModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="reviewModalLabel">Review
+                                                                    Order</h5>
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form th:action="@{/submitReview}" method="post">
+                                                                    <input type="hidden" name="productId"
+                                                                        th:value="${detail.product.productId}">
+                                                                    <!-- Rate -->
+                                                                    <div class="form-group">
+                                                                        <label for="rating">Rating:</label>
+                                                                        <div class="rating">
+                                                                            <input type="radio" id="star1" name="rating"
+                                                                                value="1" required />
+                                                                            <label class="star" for="star1"></label>
+                                                                            <input type="radio" id="star2" name="rating"
+                                                                                value="2" />
+                                                                            <label class="star" for="star2"></label>
+                                                                            <input type="radio" id="star3" name="rating"
+                                                                                value="3" />
+                                                                            <label class="star" for="star3"></label>
+                                                                            <input type="radio" id="star4" name="rating"
+                                                                                value="4" />
+                                                                            <label class="star" for="star4"></label>
+                                                                            <input type="radio" id="star5" name="rating"
+                                                                                value="5" />
+                                                                            <label class="star" for="star5"></label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- Comment -->
+                                                                    <div class="form-group">
+                                                                        <label for="comment">Comment:</label>
+                                                                        <textarea class="form-control" id="comment"
+                                                                            name="comment" rows="3"></textarea>
+                                                                    </div>
+                                                                    <button type="submit"
+                                                                        class="btn btn-primary">Submit</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="order-status text-info" th:text="${detail.status}"></span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

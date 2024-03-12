@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Optional custom CSS styles */
+        .cart-container {
+            margin-top: 50px;
+        }
+
+        .product {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .total-section {
+            border-left: 1px solid #ddd;
+        }
+
+        .quantity-input {
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- header -->
+    <div th:replace="~{layouts/header :: header}">...</div>
+
+    <div class="container cart-container">
+        <h2>Cart</h2>
+        <div th:unless="${not #lists.isEmpty(cartProducts)}">
+            <h3>Your Cart is Empty</h3>
+        </div>
+        <div class="row" th:if="${not #lists.isEmpty(cartProducts)}">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Products</h5>
+                        <!-- Product list -->
+                        <div class="product" th:each="productInfo : ${cartProducts}">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img class="ml-auto" src="https://via.placeholder.com/200x200" alt="Product Image"
+                                        width="90">
+                                </div>
+                                <div class="col-md-10 d-flex flex-column">
+                                    <div class="row h-100">
+                                        <div class="my-auto ml-4">
+                                            <h6 th:text="${productInfo.key.name}"></h6>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 d-flex justify-content-end quantityFormContainer">
+                                            <form th:action="@{/updateQuantity}" method="post">
+                                                <button type="submit" class="btn btn-secondary btn-sm quantity-btn"
+                                                    data-type="minus">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="text" name="quantity" class="quantity-input text-center"
+                                                    th:value="${productInfo.value}" style="width: 35px;">
+                                                <input type="hidden" name="slug" th:value="${productInfo.key.slug}">
+                                                <button type="submit" class="btn btn-secondary btn-sm quantity-btn"
+                                                    data-type="plus">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+                                        <div class="col-md-5 d-flex justify-content-start">
+                                            <form th:action="@{/deleteCartItem}" method="post">
+                                                <input type="hidden" name="slug" th:value="${productInfo.key.slug}">
+                                                <button type="submit" class="btn btn-danger btn-sm delete-btn">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-4 d-flex justify-content-end">
+                                            <strong>
+                                                <p th:text="'$'+ (${productInfo.key.price} * ${productInfo.value})"></p>
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 total-section">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total</h5>
+                        <p th:text="'Subtotal: $'+${subTotal}"></p>
+                        <p th:text="'Shipping Cost: $'+${shippingCost}"></p>
+                        <hr>
+                        <h6 th:text="'Total Amount: $'+${totalPrice}"></h6>
+                        <form th:action="@{/createOrder}" method="post">
+                            <button type="submit" class="btn btn-primary btn-block mt-3">Buy Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        // JavaScript for increasing or decreasing quantity
+        $(document).ready(function () {
+            $('.quantity-btn').on('click', function () {
+                var type = $(this).data('type');
+                var inputElement = $(this).siblings('.quantity-input');
+                var currentQuantity = parseInt(inputElement.val());
+
+                if (type === 'minus' && currentQuantity > 1) {
+                    inputElement.val(currentQuantity - 1);
+                } else if (type === 'plus') {
+                    inputElement.val(currentQuantity + 1);
+                }
+            });
+
+            // Manually editing quantity and allowing only numbers
+            $('.quantity-input').on('input', function () {
+                var newValue = $(this).val().replace(/[^0-9]/g, ''); // Only allow numbers
+                $(this).val(newValue); // Show only numbers
+            });
+
+
+
+        });
+        $(document).ready(function () {
+            $('.quantity-input').each(function () {
+                var previousValue = $(this).val();
+                $(this).data('previousValue', previousValue);
+            });
+
+            $('.quantity-input').on('input', function () {
+                var previousValue = $(this).data('previousValue');
+                var currentValue = $(this).val();
+
+                if (currentValue !== previousValue) {
+                    $(this).data('previousValue', currentValue);
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('.quantity-input').each(function () {
+                $(this).data('timer', null);
+            });
+
+            $('.quantity-input').on('input', function () {
+                var $input = $(this);
+                var timer = $input.data('timer');
+
+                // Eğer bir zamanlayıcı zaten çalışıyorsa, önceki zamanlayıcıyı temizleyin
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                // Yeni bir zamanlayıcı başlatın
+                timer = setTimeout(function () {
+                    $input.closest('form').submit();
+
+                }, 1000); // 1 saniye gecikme
+
+                // Zamanlayıcıyı veri özelliği olarak saklayın
+                $input.data('timer', timer);
+            });
+        });
+    </script>
+
+</body>
+
+</html>
