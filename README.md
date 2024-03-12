@@ -23,3 +23,7 @@ The E-Commerce Platform project aims to provide a comprehensive solution for bus
 - Thymeleaf
 - MySQL
 - Maven
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
